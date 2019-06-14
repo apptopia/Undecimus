@@ -57,6 +57,7 @@ static NSString *bundledResources = nil;
     [super viewDidLoad];
     
     if ([[[[NSProcessInfo processInfo] environment] allKeys] containsObject:@"CALVADOS"]) {
+        LOG(@"Calvados–initiated run");
         self.calvadosRun = YES;
     }
     
