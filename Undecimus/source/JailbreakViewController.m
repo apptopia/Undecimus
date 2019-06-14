@@ -55,6 +55,11 @@ static NSString *bundledResources = nil;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    if ([[[[NSProcessInfo processInfo] environment] allKeys] containsObject:@"CALVADOS"]) {
+        self.calvadosRun = YES;
+    }
+    
     _canExit = YES;
     // Do any additional setup after loading the view, typically from a nib.
     prefs_t *prefs = copy_prefs();
@@ -72,6 +77,21 @@ static NSString *bundledResources = nil;
     if (bundledResources == nil) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
             showAlert(localize(@"Error"), localize(@"Bundled Resources version is missing. This build is invalid."), false, false);
+        });
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    if (self.calvadosRun) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(8 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (!jailbreakEnabled()) {
+                [self tappedOnJailbreak:nil];
+            }
+            else {
+                exit(0);
+            }
         });
     }
 }

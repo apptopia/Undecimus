@@ -50,6 +50,7 @@ while (false)
 @property (readonly) JailbreakViewController *sharedController;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *goButtonSpacing;
 @property (assign) BOOL canExit;
+@property (assign) BOOL calvadosRun;
 
 double uptime(void);
 
@@ -62,6 +63,11 @@ NSString *hexFromInt(NSInteger val);
 @end
 
 static inline UIProgressHUD *addProgressHUD() {
+    JailbreakViewController *jvc = [JailbreakViewController sharedController];
+    if ([jvc calvadosRun]) {
+        return nil;
+    }
+    
     __block UIProgressHUD *hud = nil;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -76,6 +82,11 @@ static inline UIProgressHUD *addProgressHUD() {
 }
 
 static inline void removeProgressHUD(UIProgressHUD *hud) {
+    JailbreakViewController *jvc = [JailbreakViewController sharedController];
+    if ([jvc calvadosRun]) {
+        return;
+    }
+    
     if (hud == nil) {
         return;
     }
@@ -89,6 +100,11 @@ static inline void removeProgressHUD(UIProgressHUD *hud) {
 }
 
 static inline void updateProgressHUD(UIProgressHUD *hud, NSString *msg) {
+    JailbreakViewController *jvc = [JailbreakViewController sharedController];
+    if ([jvc calvadosRun]) {
+        return;
+    }
+    
     if (hud == nil) {
         return;
     }
@@ -101,6 +117,11 @@ static inline void updateProgressHUD(UIProgressHUD *hud, NSString *msg) {
 }
 
 static inline void showAlertWithCancel(NSString *title, NSString *message, Boolean wait, Boolean destructive, NSString *cancel) {
+    JailbreakViewController *jvc = [JailbreakViewController sharedController];
+    if ([jvc calvadosRun]) {
+        return;
+    }
+    
     dispatch_semaphore_t semaphore;
     if (wait)
         semaphore = dispatch_semaphore_create(0);
@@ -132,9 +153,14 @@ static inline void showAlertWithCancel(NSString *title, NSString *message, Boole
 }
 
 static inline void showAlert(NSString *title, NSString *message, Boolean wait, Boolean destructive) {
+    JailbreakViewController *jvc = [JailbreakViewController sharedController];
+    if ([jvc calvadosRun]) {
+        return;
+    }
+    
     __block bool outputIsHidden;
     dispatch_block_t checkOutput = ^{
-        outputIsHidden = [[[JailbreakViewController sharedController] outputView] isHidden];
+        outputIsHidden = [[jvc outputView] isHidden];
     };
 
     if ([[NSThread currentThread] isMainThread]) {
